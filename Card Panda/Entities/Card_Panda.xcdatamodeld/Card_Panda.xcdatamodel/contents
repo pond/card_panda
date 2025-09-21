@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24G90" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="LoyaltyCard" representedClassName="LoyaltyCard" syncable="YES" codeGenerationType="class">
+        <attribute name="barcode" attributeType="String"/>
+        <attribute name="barcodeType" attributeType="String" defaultValueString="code128"/>
+        <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" attributeType="String" defaultValueString="&quot;&quot;"/>
+    </entity>
+</model>
