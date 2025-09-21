@@ -16,41 +16,117 @@ struct CardListView: View {
     private var cards: FetchedResults<LoyaltyCard>
 
     @State private var showingScanner = false
-    @State private var showingAddCard = false
+    @State private var showingScanFromCameraRoll = false
+    @State private var showingAddManually = false
 
     var body: some View {
         NavigationView {
-            List {
-                ForEach(cards, id: \.objectID) { card in
-                    NavigationLink(destination: CardDetailView(card: card)) {
-                        RoundedRectangle(cornerRadius: 4)
-                            .fill(card.uiColor)
-                            .frame(width: 8, height: 40)
+            Group {
+                if cards.isEmpty {
+                    VStack(spacing: 30) {
+                        Spacer()
 
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(card.name ?? "Unknown")
-                                .font(.headline)
-                            Text(card.barcode ?? "")
-                                .font(.caption)
+                        Text("Card Panda")
+                            .font(.largeTitle)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                            .multilineTextAlignment(.center)
+
+                        Spacer()
+                        
+                        Image(systemName: "creditcard.fill")
+                            .font(.system(size: 80))
+                            .foregroundColor(.gray.opacity(0.4))
+                        
+                        VStack(spacing: 12) {
+                            Text("No Cards Yet")
+                                .font(.title2)
+                                .fontWeight(.semibold)
+                            
+                            Text("Scan your first card barcode to get started")
+                                .font(.body)
                                 .foregroundColor(.secondary)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, 40)
                         }
-                        .padding(.vertical, 2)
+                        
+                        VStack(spacing: 16) {
+                            Button(action: {
+                                showingScanner = true
+                            }) {
+                                HStack {
+                                    Image(systemName: "barcode.viewfinder")
+                                    Text("Scan Barcode")
+                                }
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.blue)
+                                .cornerRadius(12)
+                            }
+                            .padding(.horizontal, 40)
+                            
+                            Button(action: {
+                                showingAddManually = true
+                            }) {
+                                HStack {
+                                    Image(systemName: "keyboard")
+                                    Text("Add Manually")
+                                }
+                                .font(.headline)
+                                .foregroundColor(.blue)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(12)
+                            }
+                            .padding(.horizontal, 40)
+                        }
+                        
+                        Spacer()
+                        Spacer()
+                        Spacer()
                     }
+                    .transition(.opacity)
                 }
-                .onDelete(perform: deleteCards)
-            }
-            .navigationTitle("Card Panda")
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button("Scan Barcode") {
-                            showingScanner = true
+                else {
+                    List {
+                        ForEach(cards, id: \.objectID) { card in
+                            NavigationLink(destination: CardDetailView(card: card)) {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(card.uiColor)
+                                    .frame(width: 8, height: 40)
+
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(card.name ?? "Unknown")
+                                        .font(.headline)
+                                    Text(card.barcode ?? "")
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding(.vertical, 2)
+                            }
                         }
-                        Button("Add Manually") {
-                            showingAddCard = true
+                        .onDelete(perform: deleteCards)
+                    }
+                    .navigationTitle("Card Panda")
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Menu {
+                                Button("Scan Barcode") {
+                                    showingScanner = true
+                                }
+                                Button("Scan A Photo") {
+                                    showingScanFromCameraRoll = true
+                                }
+                                Button("Add Manually") {
+                                    showingAddManually = true
+                                }
+                            } label: {
+                                Image(systemName: "plus")
+                            }
                         }
-                    } label: {
-                        Image(systemName: "plus")
                     }
                 }
             }
@@ -61,7 +137,13 @@ struct CardListView: View {
                 }
                 .ignoresSafeArea(.all)
             }
-            .sheet(isPresented: $showingAddCard) {
+            .sheet(isPresented: $showingScanFromCameraRoll) {
+                CameraRollScannerView { barcode, symbology in
+                    let type = BarcodeUtils.barcodeSymbologyToInternalType(symbology)
+                    addCard(barcode: barcode, type: type)
+                }
+            }
+            .sheet(isPresented: $showingAddManually) {
                 AddCardManuallyView()
             }
             .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
