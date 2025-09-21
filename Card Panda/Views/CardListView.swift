@@ -21,7 +21,7 @@ struct CardListView: View {
     var body: some View {
         NavigationView {
             List {
-                ForEach(cards, id: \.self) { card in
+                ForEach(cards, id: \.objectID) { card in
                     NavigationLink(destination: CardDetailView(card: card)) {
                         RoundedRectangle(cornerRadius: 4)
                             .fill(card.uiColor)
@@ -63,6 +63,9 @@ struct CardListView: View {
             }
             .sheet(isPresented: $showingAddCard) {
                 AddCardManuallyView()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
+                viewContext.refreshAllObjects()
             }
         }
     }

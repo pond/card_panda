@@ -10,6 +10,7 @@ import CoreData
 struct CardDetailView: View {
     @ObservedObject var card: LoyaltyCard
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.dismiss) private var dismiss
 
     @FocusState private var nameFieldFocused:    Bool
     @FocusState private var barcodeFieldFocused: Bool
@@ -49,6 +50,15 @@ struct CardDetailView: View {
                     .padding()
                 } else {
                     HStack {
+                        ColorPicker("", selection: Binding(
+                            get: { card.uiColor },
+                            set: { newColor in
+                                card.uiColor = newColor
+                                try? viewContext.save()
+                            }
+                        ))
+                        .labelsHidden()
+
                         Text(card.name ?? "Unknown")
                             .font(.title)
                         Spacer()
@@ -59,28 +69,6 @@ struct CardDetailView: View {
                     }
                     .padding()
                 }
-
-                // Color section
-                HStack {
-                    Text("Colour")
-                        .font(.headline)
-                    Spacer()
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(card.uiColor)
-                            .frame(width: 24, height: 24)
-                        ColorPicker("", selection: Binding(
-                            get: { card.uiColor },
-                            set: { newColor in
-                                card.uiColor = newColor
-                                PersistenceController.shared.save()
-                                try? viewContext.save()
-                            }
-                        ))
-                        .labelsHidden()
-                    }
-                }
-                .padding(.horizontal)
 
                 BarcodeView(barcode: card.barcode ?? "", type: card.barcodeType ?? "code128")
                     .frame(height: 200)
