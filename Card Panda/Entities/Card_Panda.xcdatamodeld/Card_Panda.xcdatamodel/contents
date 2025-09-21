@@ -3,6 +3,7 @@
     <entity name="LoyaltyCard" representedClassName="LoyaltyCard" syncable="YES" codeGenerationType="class">
         <attribute name="barcode" attributeType="String"/>
         <attribute name="barcodeType" attributeType="String" defaultValueString="code128"/>
+        <attribute name="colour" optional="YES" attributeType="Binary"/>
         <attribute name="dateAdded" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name" attributeType="String" defaultValueString="&quot;&quot;"/>
     </entity>

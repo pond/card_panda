@@ -23,6 +23,10 @@ struct CardListView: View {
             List {
                 ForEach(cards, id: \.self) { card in
                     NavigationLink(destination: CardDetailView(card: card)) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(card.uiColor)
+                            .frame(width: 8, height: 40)
+
                         VStack(alignment: .leading, spacing: 4) {
                             Text(card.name ?? "Unknown")
                                 .font(.headline)
@@ -51,12 +55,14 @@ struct CardListView: View {
                 }
             }
             .sheet(isPresented: $showingScanner) {
-                BarcodeScannerView { barcode, type in
+                BarcodeScannerView { barcode, symbology in
+                    let type = BarcodeUtils.barcodeSymbologyToInternalType(symbology)
                     addCard(barcode: barcode, type: type)
                 }
+                .ignoresSafeArea(.all)
             }
             .sheet(isPresented: $showingAddCard) {
-                AddCardView()
+                AddCardManuallyView()
             }
         }
     }
@@ -68,14 +74,14 @@ struct CardListView: View {
         newCard.barcodeType = type
         newCard.dateAdded = Date()
 
-        PersistenceController.shared.save()
+        try? viewContext.save()
         showingScanner = false
     }
 
     private func deleteCards(offsets: IndexSet) {
         withAnimation {
             offsets.map { cards[$0] }.forEach(viewContext.delete)
-            PersistenceController.shared.save()
+            try? viewContext.save()
         }
     }
 

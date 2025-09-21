@@ -4,22 +4,28 @@
 //
 //  Created by Andrew Hodgkinson on 21/09/2025.
 //
-import AVFoundation
+import Vision
 
 enum BarcodeUtils {
-    static func barcodeAVFoundationTypeToString(_ type: AVMetadataObject.ObjectType) -> String {
-        switch type {
-            case .ean8:       return "ean8"
-            case .ean13:      return "ean13"
-            case .pdf417:     return "pdf417"
-            case .code39:     return "code39"
-            case .code93:     return "code93"
-            case .upce:       return "upce"
-            case .aztec:      return "aztec"
-            case .dataMatrix: return "dataMatrix"
-            case .qr:         return "qr"
+    static func barcodeSymbologyToInternalType(_ symbology: VNBarcodeSymbology) -> String {
+        switch symbology {
+            case .aztec:                   return "aztec"
+            case .code39:                  return "code39"
+            case .code39Checksum:          return "code93"
+            case .code39FullASCII:         return "code93"
+            case .code39FullASCIIChecksum: return "code93"
+            case .code93:                  return "code93"
+            case .code93i:                 return "code93"
+            case .dataMatrix:              return "dataMatrix"
+            case .ean13:                   return "ean13"
+            case .ean8:                    return "ean8"
+            case .microPDF417:             return "pdf417"
+            case .microQR:                 return "qr"
+            case .pdf417:                  return "pdf417"
+            case .qr:                      return "qr"
+            case .upce:                    return "upce"
 
-            default:          return "code128"
+            default:                       return "code128"
         }
     }
 

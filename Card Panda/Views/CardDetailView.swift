@@ -5,6 +5,7 @@
 //  Created by Andrew Hodgkinson on 21/09/2025.
 //
 import SwiftUI
+import CoreData
 
 struct CardDetailView: View {
     @ObservedObject var card: LoyaltyCard
@@ -21,7 +22,7 @@ struct CardDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 10) {
                 if editingName {
                     VStack(spacing: 10) {
                         TextField("Card name", text: $newName)
@@ -34,6 +35,7 @@ struct CardDetailView: View {
                             Button("Save") {
                                 card.name = newName
                                 PersistenceController.shared.save()
+                                try? viewContext.save()
                                 editingName = false
                             }
                             .buttonStyle(.borderedProminent)
@@ -58,6 +60,28 @@ struct CardDetailView: View {
                     .padding()
                 }
 
+                // Color section
+                HStack {
+                    Text("Colour")
+                        .font(.headline)
+                    Spacer()
+                    HStack(spacing: 8) {
+                        Circle()
+                            .fill(card.uiColor)
+                            .frame(width: 24, height: 24)
+                        ColorPicker("", selection: Binding(
+                            get: { card.uiColor },
+                            set: { newColor in
+                                card.uiColor = newColor
+                                PersistenceController.shared.save()
+                                try? viewContext.save()
+                            }
+                        ))
+                        .labelsHidden()
+                    }
+                }
+                .padding(.horizontal)
+
                 BarcodeView(barcode: card.barcode ?? "", type: card.barcodeType ?? "code128")
                     .frame(height: 200)
 
@@ -73,7 +97,7 @@ struct CardDetailView: View {
                         HStack {
                             Button("Save") {
                                 card.barcode = newBarcode
-                                PersistenceController.shared.save()
+                                try? viewContext.save()
                                 editingBarcode = false
                             }
                             .buttonStyle(.borderedProminent)

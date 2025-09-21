@@ -1,5 +1,5 @@
 //
-//  AddCardView.swift
+//  AddCardManuallyView.swift
 //  Card Panda
 //
 //  Created by Andrew Hodgkinson on 21/09/2025.
@@ -7,7 +7,7 @@
 import SwiftUI
 import CoreData
 
-struct AddCardView: View {
+struct AddCardManuallyView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.presentationMode) var presentationMode
 
@@ -45,7 +45,7 @@ struct AddCardView: View {
                         newCard.barcodeType = "code128"
                         newCard.dateAdded = Date()
 
-                        PersistenceController.shared.save()
+                        try? viewContext.save()
                         presentationMode.wrappedValue.dismiss()
                     }
                     .disabled(barcode.isEmpty)
