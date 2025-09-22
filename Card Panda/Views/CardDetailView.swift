@@ -28,6 +28,8 @@ struct CardDetailView: View {
                     VStack(spacing: 10) {
                         TextField("Card name", text: $newName)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .autocapitalization(.words)
+                            .autocorrectionDisabled()
                             .focused($nameFieldFocused)
                             .onAppear {
                                 nameFieldFocused = true
@@ -78,6 +80,7 @@ struct CardDetailView: View {
                         TextField("Barcode number", text: $newBarcode)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .keyboardType(.numbersAndPunctuation)
+                            .autocorrectionDisabled()
                             .focused($barcodeFieldFocused)
                             .onAppear {
                                 barcodeFieldFocused = true
@@ -119,7 +122,7 @@ struct CardDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             originalBrightness = UIScreen.main.brightness
-            UIScreen.main.brightness = 1.0
+            UIScreen.main.brightness = 0.9
         }
         .onWillDisappear {
             UIScreen.main.brightness = originalBrightness

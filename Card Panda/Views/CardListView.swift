@@ -15,9 +15,7 @@ struct CardListView: View {
         animation: .default)
     private var cards: FetchedResults<LoyaltyCard>
 
-    @State private var showingScanner = false
-    @State private var showingScanFromCameraRoll = false
-    @State private var showingAddManually = false
+    @State private var showingAddCard = false
 
     var body: some View {
         NavigationView {
@@ -50,40 +48,22 @@ struct CardListView: View {
                                 .padding(.horizontal, 40)
                         }
                         
-                        VStack(spacing: 16) {
-                            Button(action: {
-                                showingScanner = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "barcode.viewfinder")
-                                    Text("Scan Barcode")
-                                }
-                                .font(.headline)
-                                .foregroundColor(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue)
-                                .cornerRadius(12)
+                        Button(action: {
+                            showingAddCard = true
+                        }) {
+                            HStack {
+                                Image(systemName: "plus.circle.fill")
+                                Text("Add Card")
                             }
-                            .padding(.horizontal, 40)
-                            
-                            Button(action: {
-                                showingAddManually = true
-                            }) {
-                                HStack {
-                                    Image(systemName: "keyboard")
-                                    Text("Add Manually")
-                                }
-                                .font(.headline)
-                                .foregroundColor(.blue)
-                                .frame(maxWidth: .infinity)
-                                .padding()
-                                .background(Color.blue.opacity(0.1))
-                                .cornerRadius(12)
-                            }
-                            .padding(.horizontal, 40)
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(12)
                         }
-                        
+                        .padding(.horizontal, 40)
+
                         Spacer()
                         Spacer()
                         Spacer()
@@ -111,40 +91,20 @@ struct CardListView: View {
                         .onDelete(perform: deleteCards)
                     }
                     .navigationTitle("Card Panda")
-                    .toolbar {
-                        ToolbarItem(placement: .navigationBarTrailing) {
-                            Menu {
-                                Button("Scan Barcode") {
-                                    showingScanner = true
-                                }
-                                Button("Scan A Photo") {
-                                    showingScanFromCameraRoll = true
-                                }
-                                Button("Add Manually") {
-                                    showingAddManually = true
-                                }
-                            } label: {
-                                Image(systemName: "plus")
-                            }
-                        }
+                }
+            }
+            .background(Color(.systemGroupedBackground))
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {
+                        showingAddCard = true
+                    }) {
+                        Image(systemName: "plus")
                     }
                 }
             }
-            .sheet(isPresented: $showingScanner) {
-                BarcodeScannerView { barcode, symbology in
-                    let type = BarcodeUtils.barcodeSymbologyToInternalType(symbology)
-                    addCard(barcode: barcode, type: type)
-                }
-                .ignoresSafeArea(.all)
-            }
-            .sheet(isPresented: $showingScanFromCameraRoll) {
-                CameraRollScannerView { barcode, symbology in
-                    let type = BarcodeUtils.barcodeSymbologyToInternalType(symbology)
-                    addCard(barcode: barcode, type: type)
-                }
-            }
-            .sheet(isPresented: $showingAddManually) {
-                AddCardManuallyView()
+            .sheet(isPresented: $showingAddCard) {
+                UnifiedAddCardView()
             }
             .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
                 viewContext.refreshAllObjects()
@@ -160,47 +120,13 @@ struct CardListView: View {
         newCard.dateAdded = Date()
 
         try? viewContext.save()
-        showingScanner = false
+        showingAddCard = false
     }
 
     private func deleteCards(offsets: IndexSet) {
         withAnimation {
             offsets.map { cards[$0] }.forEach(viewContext.delete)
             try? viewContext.save()
-        }
-    }
-
-    private func addItem(name: String? = nil, barcode: String, type: String = "code128") {
-        withAnimation {
-            let newCard = LoyaltyCard(context: viewContext)
-
-            newCard.name = name ?? "Card \(cards.count + 1)"
-            newCard.barcode = barcode
-            newCard.barcodeType = type
-            newCard.dateAdded = Date()
-
-            do {
-                try viewContext.save()
-            } catch {
-                // UnfixableError().display(message: "Couldn't save the card due to an unexpected and unrecoverable error", using: self)
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
-        }
-    }
-
-    private func deleteItems(offsets: IndexSet) {
-        withAnimation {
-            offsets.map { cards[$0] }.forEach(viewContext.delete)
-
-            do {
-                try viewContext.save()
-            } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                let nsError = error as NSError
-                fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
-            }
         }
     }
 }

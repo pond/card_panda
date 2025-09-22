@@ -13,7 +13,7 @@ extension LoyaltyCard {
                let uiColor = try? NSKeyedUnarchiver.unarchivedObject(ofClass: UIColor.self, from: colourData) {
                 return Color(uiColor)
             }
-            return .gray // Default color
+            return Constants.defaultCardColour
         }
         set {
             let uiColor = UIColor(newValue)
