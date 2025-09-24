@@ -10,22 +10,9 @@
 		230DF7F12E7CF6060020F75E /* Card Panda.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Card Panda.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		2335778E2E83BDE000AC2D4E /* Exceptions for "Card Panda" folder in "Card Panda" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"Card-Panda-Info.plist",
-			);
-			target = 230DF7F02E7CF6060020F75E /* Card Panda */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		230DF7F32E7CF6060020F75E /* Card Panda */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				2335778E2E83BDE000AC2D4E /* Exceptions for "Card Panda" folder in "Card Panda" target */,
-			);
 			path = "Card Panda";
 			sourceTree = "<group>";
 		};
