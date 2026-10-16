@@ -9,17 +9,19 @@ import CoreData
 
 struct CardDetailView: View {
     @ObservedObject var card: LoyaltyCard
+
+    @Environment(\.scenePhase) private var scenePhase
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
 
     @FocusState private var nameFieldFocused:    Bool
     @FocusState private var barcodeFieldFocused: Bool
 
-    @State private var editingName        = false
-    @State private var editingBarcode     = false
-    @State private var newName            = ""
-    @State private var newBarcode         = ""
-    @State private var originalBrightness = UIScreen.main.brightness
+    @State private var editingName       = false
+    @State private var editingBarcode    = false
+    @State private var newName           = ""
+    @State private var newBarcode        = ""
+    @State private var brightnessBooster = BrightnessBooster()
 
     var body: some View {
         ScrollView {
@@ -120,12 +122,18 @@ struct CardDetailView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            originalBrightness = UIScreen.main.brightness
-            UIScreen.main.brightness = 0.9
-        }
-        .onWillDisappear {
-            UIScreen.main.brightness = originalBrightness
+        .background(
+            ViewWill(
+                appear:    { brightnessBooster.boost()   },
+                disappear: { brightnessBooster.restore() }
+            )
+        )
+        .onChange(of: scenePhase) { phase in
+            switch phase {
+                case .active:                brightnessBooster.boost()
+                case .inactive, .background: brightnessBooster.restore()
+                @unknown default:            brightnessBooster.restore()
+            }
         }
     }
 }

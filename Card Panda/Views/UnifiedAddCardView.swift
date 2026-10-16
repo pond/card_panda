@@ -49,7 +49,7 @@ struct UnifiedAddCardView: View {
                             .focused($isNameFocused)
                     }
                 } header: {
-                    Text("COLOUR AND NAME")
+                    Text("Colour and Name")
                 }
 
                 Section {
@@ -114,16 +114,19 @@ struct UnifiedAddCardView: View {
             .navigationTitle("Add Card")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
+                ToolbarItem(placement: .cancellationAction) {
+                    if #available(iOS 26, *) {
+                        Button(role: .cancel) { dismiss() }
+                    } else {
+                        Button("Cancel") { dismiss() }
                     }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        saveCard()
+                ToolbarItem(placement: .confirmationAction) {
+                    if #available(iOS 26, *) {
+                        Button(role: .confirm) { saveCard() }.disabled(barcode.isEmpty)
+                    } else {
+                        Button("Save") { saveCard() }.disabled(barcode.isEmpty)
                     }
-                    .disabled(barcode.isEmpty)
                 }
             }
             .onAppear {

@@ -15,7 +15,8 @@ struct CardListView: View {
         animation: .default)
     private var cards: FetchedResults<LoyaltyCard>
 
-    @State private var showingAddCard = false
+    @State private var showingSettings = false
+    @State private var showingAddCard  = false
 
     var body: some View {
         NavigationView {
@@ -74,10 +75,7 @@ struct CardListView: View {
                     List {
                         ForEach(cards, id: \.objectID) { card in
                             NavigationLink(destination: CardDetailView(card: card)) {
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(card.uiColor)
-                                    .frame(width: 8, height: 40)
-
+                                CardSwatch(color: card.uiColor)
                                 VStack(alignment: .leading, spacing: 4) {
                                     Text(card.name ?? "Unknown")
                                         .font(.headline)
@@ -95,16 +93,25 @@ struct CardListView: View {
             }
             .background(Color(.systemGroupedBackground))
             .toolbar {
+                if #available(iOS 26, *) {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button { showingSettings = true } label: {
+                            Image(systemName: "gearshape")
+                        }
+                    }
+                }
+
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        showingAddCard = true
-                    }) {
+                    Button { showingAddCard = true } label: {
                         Image(systemName: "plus")
                     }
                 }
             }
             .sheet(isPresented: $showingAddCard) {
                 UnifiedAddCardView()
+            }
+            .sheet(isPresented: $showingSettings) {
+                Settings()
             }
             .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextDidSave)) { _ in
                 viewContext.refreshAllObjects()
